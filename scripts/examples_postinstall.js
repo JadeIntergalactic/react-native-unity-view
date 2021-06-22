@@ -46,12 +46,14 @@ const removeFileDirectoryRecursively = fileDirPath => {
 };
 
 /// Remove example/node_modules/react-native-library-name/node_modules directory
-const removeLibraryNodeModulesPath = (libraryNodeModulesPath) => {
+const removeLibraryNodeModulesPath = libraryNodeModulesPath => {
   const nodeModulesPath = path.resolve(libraryNodeModulesPath, 'node_modules');
 
   if (!fs.existsSync(nodeModulesPath)) {
-    console.log(`No node_modules path found at ${nodeModulesPath}. Skipping delete.`);
+    console.log(
+      `No node_modules path found at ${nodeModulesPath}. Skipping delete.`,
     );
+
     return;
   }
 
@@ -67,36 +69,40 @@ const removeLibraryNodeModulesPath = (libraryNodeModulesPath) => {
 /// Remove all entries from the .npmignore within  example/node_modules/react-native-library-name/
 const removeLibraryNpmIgnorePaths = (npmIgnorePath, libraryNodeModulesPath) => {
   if (!fs.existsSync(npmIgnorePath)) {
-    console.log(`No .npmignore path found at ${npmIgnorePath}. Skipping deleting content.`);
+    console.log(
+      `No .npmignore path found at ${npmIgnorePath}. Skipping deleting content.`,
     );
+
     return;
   }
 
-  fs.readFileSync(npmIgnorePath, 'utf8').split(/\r?\n/).forEach(entry => {
-    if (entry.length === 0) {
-      return;
-    }
+  fs.readFileSync(npmIgnorePath, 'utf8')
+    .split(/\r?\n/)
+    .forEach(entry => {
+      if (entry.length === 0) {
+        return;
+      }
 
-    const npmIgnoreLibraryNodeModulesEntryPath = path.resolve(
+      const npmIgnoreLibraryNodeModulesEntryPath = path.resolve(
         libraryNodeModulesPath,
         entry,
       );
-    if (!fs.existsSync(npmIgnoreLibraryNodeModulesEntryPath)) {
-      return;
-    }
+      if (!fs.existsSync(npmIgnoreLibraryNodeModulesEntryPath)) {
+        return;
+      }
 
-    console.log(`Deleting: ${npmIgnoreLibraryNodeModulesEntryPath}`);
-    try {
-      removeFileDirectoryRecursively(npmIgnoreLibraryNodeModulesEntryPath);
-      console.log(
+      console.log(`Deleting: ${npmIgnoreLibraryNodeModulesEntryPath}`);
+      try {
+        removeFileDirectoryRecursively(npmIgnoreLibraryNodeModulesEntryPath);
+        console.log(
           `Successfully deleted: ${npmIgnoreLibraryNodeModulesEntryPath}`,
         );
-    } catch (err) {
-      console.log(
+      } catch (err) {
+        console.log(
           `Error deleting ${npmIgnoreLibraryNodeModulesEntryPath}: ${err.message}`,
         );
-    }
-  });
+      }
+    });
 };
 
 // Main start sweeping process
@@ -107,9 +113,10 @@ const removeLibraryNpmIgnorePaths = (npmIgnorePath, libraryNodeModulesPath) => {
   console.log(`Starting postinstall cleanup for ${exampleDir}`);
 
   // Resolve the React Native library's path within the example's node_modules directory
-  const libraryNodeModulesPath = process.argv.length > 2
-    ? path.resolve(exampleDir, process.argv[2])
-    : path.resolve(
+  const libraryNodeModulesPath =
+    process.argv.length > 2
+      ? path.resolve(exampleDir, process.argv[2])
+      : path.resolve(
           exampleDir,
           'node_modules',
           require('../package.json').name,
