@@ -35,6 +35,8 @@ class UnityView extends Component<UnityViewProps> {
 
     componentDidMount(): void {
         const { onUnityMessage, onMessage, unloadOnUnmount } = this.props
+        console.log("Mounting the thing")
+
         this.setState({
             handle: UnityModule.addMessageListener(message => {
                 if (onUnityMessage && message instanceof MessageHandler) {
@@ -51,6 +53,7 @@ class UnityView extends Component<UnityViewProps> {
     }
 
     componentWillUnmount(): void {
+        console.log("Unmounting The thing")
         const { unloadOnUnmount } = this.props;
 
         UnityModule.removeMessageListener(this.state.handle)
