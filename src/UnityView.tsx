@@ -78,6 +78,35 @@ class UnityView extends Component<UnityViewProps> {
         )
     }
 }
+/*
+const UnityView = ({ onUnityMessage, onMessage, ...props } : UnityViewProps) => {
+    const [handle, setHandle] = useState(null)
+    useEffect(() => {
+        setHandle(UnityModule.addMessageListener(message => {
+            if (onUnityMessage && message instanceof MessageHandler) {
+                onUnityMessage(message)
+            }
+            if (onMessage && typeof message === 'string') {
+                onMessage(message)
+            }
+        }))
+        return () => {
+            UnityModule.removeMessageListener(handle)
+        }
+    }, [onUnityMessage, onMessage, handle, setHandle])
+    return (
+        <View {...props}>
+            <NativeUnityView
+                style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+                onUnityMessage={onUnityMessage}
+                onMessage={onMessage}
+            >
+            </NativeUnityView>
+            {props.children}
+        </View>
+    )
+}
+*/
 
 NativeUnityView = requireNativeComponent('RNUnityView', UnityView)
 
