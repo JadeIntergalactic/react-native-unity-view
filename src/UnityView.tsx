@@ -28,6 +28,9 @@ export interface UnityViewProps extends ViewProps {
 let NativeUnityView
 
 class UnityView extends Component<UnityViewProps> {
+    static defaultProps = {
+        unloadOnUnmount: true,
+    }
 
     state = {
         handle: null
@@ -35,7 +38,6 @@ class UnityView extends Component<UnityViewProps> {
 
     componentDidMount(): void {
         const { onUnityMessage, onMessage, unloadOnUnmount } = this.props
-        console.log("Mounting the thing")
 
         this.setState({
             handle: UnityModule.addMessageListener(message => {
@@ -53,7 +55,6 @@ class UnityView extends Component<UnityViewProps> {
     }
 
     componentWillUnmount(): void {
-        console.log("Unmounting The thing")
         const { unloadOnUnmount } = this.props;
 
         UnityModule.removeMessageListener(this.state.handle)
