@@ -2,6 +2,7 @@ package no.asmadsen.unity.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ public class UnityUtils {
             new CopyOnWriteArraySet<>();
     private static UnityPlayer unityPlayer;
     private static boolean _isUnityReady;
+    private static boolean unity_unloaded = false;
     private static boolean _isUnityPaused;
 
     public static UnityPlayer getPlayer() {
@@ -51,7 +53,7 @@ public class UnityUtils {
                 unityPlayer = new UnityPlayer(activity);
 
                 try {
-                    // wait a moument. fix unity cannot start when startup.
+                    // wait a moment. fix unity cannot start when startup.
                     Thread.sleep(1000);
                 } catch (Exception e) {
                 }
@@ -71,6 +73,27 @@ public class UnityUtils {
                 callback.onReady();
             }
         });
+    }
+
+    public static void unload()
+    {
+        if (_isUnityReady && !unity_unloaded)
+        {
+            unityPlayer.unload();
+            unity_unloaded = true;
+        }
+    }
+
+    public static void reloadAfterUnload()
+    {
+        if (_isUnityReady && unity_unloaded)
+        {
+            unityPlayer.windowFocusChanged(true);
+            unityPlayer.requestFocus();
+            unityPlayer.resume();
+
+            unity_unloaded = false;
+        }
     }
 
     public static void postMessage(String gameObject, String methodName, String message) {
