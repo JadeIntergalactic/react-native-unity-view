@@ -18,18 +18,27 @@ export interface UnityViewProps extends ViewProps {
     onUnityMessage?: (handler: MessageHandler) => void;
 
     children?: React.ReactNode
+
+    /**
+     * Calls Application.Unload() when the view is unmounted.
+     */
+    unloadOnUnmount?: boolean;
 }
 
 let NativeUnityView
 
 class UnityView extends Component<UnityViewProps> {
+    static defaultProps = {
+        unloadOnUnmount: true,
+    }
 
     state = {
         handle: null
     }
 
     componentDidMount(): void {
-        const { onUnityMessage, onMessage } = this.props
+        const { onUnityMessage, onMessage, unloadOnUnmount } = this.props
+
         this.setState({
             handle: UnityModule.addMessageListener(message => {
                 if (onUnityMessage && message instanceof MessageHandler) {
@@ -40,10 +49,19 @@ class UnityView extends Component<UnityViewProps> {
                 }
             })
         })
+        if (unloadOnUnmount) {
+            UnityModule.reloadAfterUnload();
+        }
     }
 
     componentWillUnmount(): void {
+        const { unloadOnUnmount } = this.props;
+
         UnityModule.removeMessageListener(this.state.handle)
+
+        if (unloadOnUnmount) {
+            UnityModule.unload();
+        }
     }
 
     render() {
@@ -64,7 +82,6 @@ class UnityView extends Component<UnityViewProps> {
 /*
 const UnityView = ({ onUnityMessage, onMessage, ...props } : UnityViewProps) => {
     const [handle, setHandle] = useState(null)
-
     useEffect(() => {
         setHandle(UnityModule.addMessageListener(message => {
             if (onUnityMessage && message instanceof MessageHandler) {
@@ -78,7 +95,6 @@ const UnityView = ({ onUnityMessage, onMessage, ...props } : UnityViewProps) => 
             UnityModule.removeMessageListener(handle)
         }
     }, [onUnityMessage, onMessage, handle, setHandle])
-
     return (
         <View {...props}>
             <NativeUnityView

@@ -20,6 +20,10 @@ void UnityPauseCommand();
 
 void UnityResumeCommand();
 
+void UnityUnloadCommand();
+
+void UnityReloadAfterUnloadCommand();
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

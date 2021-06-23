@@ -9,7 +9,7 @@
 static const int constsection = 0;
 
 bool unity_inited = false;
-
+bool unity_unloaded = false;
 int g_argc;
 char** g_argv;
 
@@ -42,15 +42,18 @@ UnityFramework* UnityFrameworkLoad() {
 
 extern "C" void InitUnity()
 {
-    if (unity_inited) {
-        return;
-    }
-    unity_inited = true;
-
     ufw = UnityFrameworkLoad();
 
     [ufw setDataBundleId: "com.unity3d.framework"];
     [ufw frameworkWarmup: g_argc argv: g_argv];
+
+    UIApplication* application = [UIApplication sharedApplication];
+
+    UnityAppController *controller = GetAppController();
+    [controller application:application didFinishLaunchingWithOptions:nil];
+    [controller applicationDidBecomeActive:application];
+    
+    unity_inited = true;
 }
 
 extern "C" void UnityPostMessage(NSString* gameObject, NSString* methodName, NSString* message)
@@ -72,6 +75,30 @@ extern "C" void UnityResumeCommand()
     dispatch_async(dispatch_get_main_queue(), ^{
         [ufw pause:false];
     });
+}
+
+// Unloads the Unity Runtime
+extern "C" void UnityUnloadCommand()
+{
+    if (unity_inited && !unity_unloaded)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ufw unloadApplication];
+            unity_unloaded = true;
+        });
+    }
+}
+
+// Loads the Unity Runtime after "[ufw unloadApplication];"
+extern "C" void UnityReloadAfterUnloadCommand()
+{
+    if (unity_inited && unity_unloaded)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ufw reloadApplication];
+            unity_unloaded = false;
+        });
+    }
 }
 
 @implementation UnityUtils
@@ -146,12 +173,9 @@ static BOOL _isUnityReady = NO;
         // Always keep RN window in top
         application.keyWindow.windowLevel = UIWindowLevelNormal + 1;
 
+        // Initialize the Unity Runtime
         InitUnity();
-        
-        UnityAppController *controller = GetAppController();
-        [controller application:application didFinishLaunchingWithOptions:nil];
-        [controller applicationDidBecomeActive:application];
-        
+
         // Makes RN window key window to handle events
         [application.windows[1] makeKeyWindow];
         

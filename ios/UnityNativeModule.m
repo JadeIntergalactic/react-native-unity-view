@@ -43,4 +43,14 @@ RCT_EXPORT_METHOD(resume)
     UnityResumeCommand();
 }
 
+RCT_EXPORT_METHOD(unload)
+{
+    UnityUnloadCommand();
+}
+
+RCT_EXPORT_METHOD(reloadAfterUnload)
+{
+    UnityReloadAfterUnloadCommand();
+}
+
 @end

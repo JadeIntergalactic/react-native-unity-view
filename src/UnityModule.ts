@@ -40,9 +40,19 @@ export interface UnityModule {
     pause (): void;
 
     /**
-     * Pause the unity player
+     * Resume the unity player
      */
     resume (): void;
+
+    /**
+     * Unload the unity player
+     */
+    unload (): void;
+
+    /**
+     * Reloads the unity player after UnityModule.unload(), or Application.Unload().
+     */
+    reloadAfterUnload(): void;
 
     /**
      * Receive string and json message from unity.
@@ -143,6 +153,15 @@ class UnityModuleImpl implements UnityModule {
 
     public resume () {
         UnityNativeModule.resume()
+    }
+
+    public unload () {
+        UnityNativeModule.unload()
+    }
+
+    public reloadAfterUnload()
+    {
+        UnityNativeModule.reloadAfterUnload()
     }
 
     public addMessageListener (listener: (handler: string | MessageHandler) => void) {
