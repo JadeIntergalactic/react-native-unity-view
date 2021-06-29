@@ -128,7 +128,7 @@ afterEvaluate { project ->
     artifacts {
         archives androidSourcesJar
         // Commented because it can fail to build with ARCore
-        //archives androidJavadocJar
+        // archives androidJavadocJar
     }
 
     task installArchives(type: Upload) {
